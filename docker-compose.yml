@@ -44,24 +44,51 @@ services:
       - KONG_ADMIN_LISTEN=0.0.0.0:8001, 0.0.0.0:8444 ssl
     restart: on-failure
     ports:
-      - 8000:8000
-      - 8443:8443
-      - 8001:8001
-      - 8444:8444
+      # These ports are still useful for direct access if needed, but Traefik will handle external routing
+      - 8000:8000 # Kong proxy HTTP
+      - 8443:8443 # Kong proxy HTTPS
+      - 8001:8001 # Kong Admin API HTTP
+      - 8444:8444 # Kong Admin API HTTPS
     links:
       - kong-database:kong-database
     depends_on:
       - kong-migrations
+    labels:
+      # Enable Traefik for the Kong service
+      - "traefik.enable=true"
+      # Define the router for Kong's proxy (public API gateway)
+      - "traefik.http.routers.kong-proxy.rule=Host(`kong.yourdomain.com`)" # Adjust hostname as needed
+      - "traefik.http.routers.kong-proxy.entrypoints=websecure"
+      - "traefik.http.routers.kong-proxy.service=kong-proxy"
+      # Specify the service name and the internal port Kong's proxy listens on (8000)
+      - "traefik.http.services.kong-proxy.loadbalancer.server.port=8000"
+
+      # Define a separate router for Kong's Admin API (for internal use, or if you expose it)
+      - "traefik.http.routers.kong-admin.rule=Host(`kong-admin.yourdomain.com`)" # Adjust hostname as needed
+      - "traefik.http.routers.kong-admin.entrypoints=websecure"
+      - "traefik.http.routers.kong-admin.service=kong-admin"
+      # Specify the service name and the internal port Kong's Admin API listens on (8001)
+      - "traefik.http.services.kong-admin.loadbalancer.server.port=8001"
 
   konga:
     image: packyzbq/konga:0.14.9-arm64
     ports:
+      # This port is still useful for direct access, but Traefik will handle external routing
       - 1337:1337
     links:
       - kong:kong
     container_name: konga
     environment:
       - NODE_ENV=production
+    labels:
+      # Enable Traefik for the Konga service
+      - "traefik.enable=true"
+      # Define the router for Konga
+      - "traefik.http.routers.konga.rule=Host(`konga.yourdomain.com`)" # Adjust hostname as needed
+      - "traefik.http.routers.konga.entrypoints=websecure"
+      - "traefik.http.routers.konga.service=konga"
+      # Specify the service name and the internal port Konga listens on (1337)
+      - "traefik.http.services.konga.loadbalancer.server.port=1337"
 
 volumes:
   db-data-kong-postgres:
