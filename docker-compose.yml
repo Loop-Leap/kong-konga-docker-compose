@@ -54,7 +54,7 @@ services:
       - kong-migrations
 
   konga:
-    image: pantsel/konga
+    image: packyzbq/konga:0.14.9-arm64
     ports:
       - 1337:1337
     links:
