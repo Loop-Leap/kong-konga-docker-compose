@@ -27,7 +27,7 @@ services:
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - PGPASSWORD=${POSTGRES_PASSWORD}   # <-- Added this line
+      - PGPASSWORD=${POSTGRES_PASSWORD}
     entrypoint: >
       bash -c "
         until pg_isready -h kong-database -U ${POSTGRES_USER}; do
@@ -103,6 +103,7 @@ services:
       - DB_PASSWORD=${POSTGRES_PASSWORD}
       - DB_DATABASE=${KONGA_DB}
       - KONGA_HOOK_TIMEOUT=120000
+      - KONGA_KONG_URL=http://kong:8001
     networks:
       - kong-net
     labels:
