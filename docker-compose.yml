@@ -12,10 +12,11 @@ services:
     volumes:
       - "db-data-kong-postgres:/var/lib/postgresql/data"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
-      interval: 30s
-      timeout: 30s
-      retries: 3
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     networks:
       - kong-net
 
@@ -81,7 +82,7 @@ services:
       - "traefik.http.services.kong-admin.loadbalancer.server.port=8001"
 
   konga:
-    image: pantsel/konga:latest
+    image: packyzbq/konga:0.14.9-arm64
     ports:
       - "1337:1337"
     container_name: konga
