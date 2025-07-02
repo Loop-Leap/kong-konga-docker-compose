@@ -4,7 +4,7 @@ services:
     image: postgres:13
     container_name: kong-database
     ports:
-      - "5432:5432"
+      - "5432:5432"  # Keep this if you want direct database access for debugging
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_DB=${POSTGRES_DB}
@@ -54,11 +54,11 @@ services:
       - KONG_ADMIN_LISTEN=0.0.0.0:8001
       - KONG_ADMIN_GUI_URL=${KONG_ADMIN_GUI_URL}
     restart: on-failure
-    ports:
-      - "8000:8000"  # Kong proxy HTTP
-      - "8443:8443"  # Kong proxy HTTPS
-      - "8001:8001"  # Kong Admin API HTTP
-      - "8444:8444"  # Kong Admin API HTTPS
+    # ports:
+      # - "8000:8000"  # Kong proxy HTTP - handled by Traefik
+      # - "8443:8443"  # Kong proxy HTTPS - handled by Traefik
+      # - "8001:8001"  # Kong Admin API HTTP - handled by Traefik
+      # - "8444:8444"  # Kong Admin API HTTPS - handled by Traefik
     depends_on:
       - kong-migrations
     networks:
@@ -83,8 +83,8 @@ services:
 
   konga:
     image: packyzbq/konga:0.14.9-arm64
-    ports:
-      - "1337:1337"
+    # ports:
+      # - "1337:1337"  # Konga UI - handled by Traefik
     container_name: konga
     environment:
       - NODE_ENV=${NODE_ENV}
