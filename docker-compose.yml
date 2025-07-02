@@ -24,6 +24,10 @@ services:
     depends_on:
       kong-database:
         condition: service_healthy
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - PGPASSWORD=${POSTGRES_PASSWORD}   # <-- Added this line
     entrypoint: >
       bash -c "
         until pg_isready -h kong-database -U ${POSTGRES_USER}; do
@@ -32,9 +36,6 @@ services:
         psql -h kong-database -U ${POSTGRES_USER} -tc \"SELECT 1 FROM pg_database WHERE datname = '${KONGA_DB}'\" | grep -q 1 ||
         psql -h kong-database -U ${POSTGRES_USER} -c \"CREATE DATABASE \\\"${KONGA_DB}\\\"\";
       "
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     networks:
       - kong-net
     restart: "no"
