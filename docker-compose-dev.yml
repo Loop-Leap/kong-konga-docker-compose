@@ -78,14 +78,16 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.kong-proxy.rule=Host(`dev.displate.top`)"
-      - "traefik.http.routers.kong-proxy.entrypoints=websecure"
+      - "traefik.http.routers.kong-proxy.entrypoints=https"
       - "traefik.http.routers.kong-proxy.service=kong-proxy"
       - "traefik.http.routers.kong-proxy.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.kong-proxy.tls=true"
       - "traefik.http.services.kong-proxy.loadbalancer.server.port=8000"
       - "traefik.http.routers.kong-admin.rule=Host(`displate-gateway-admin.dev.displate.top`)"
-      - "traefik.http.routers.kong-admin.entrypoints=websecure"
+      - "traefik.http.routers.kong-admin.entrypoints=https"
       - "traefik.http.routers.kong-admin.service=kong-admin"
       - "traefik.http.routers.kong-admin.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.kong-admin.tls=true"
       - "traefik.http.services.kong-admin.loadbalancer.server.port=8001"
     restart: on-failure
 
@@ -109,9 +111,10 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.konga.rule=Host(`konga.dev.displate.top`)"
-      - "traefik.http.routers.konga.entrypoints=websecure"
+      - "traefik.http.routers.konga.entrypoints=https"
       - "traefik.http.routers.konga.service=konga"
       - "traefik.http.routers.konga.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.konga.tls=true"
       - "traefik.http.services.konga.loadbalancer.server.port=1337"
 
 volumes:
