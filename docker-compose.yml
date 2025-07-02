@@ -40,7 +40,7 @@ services:
     restart: "no"
 
   kong-migrations:
-    image: kong/kong-gateway:3.6.1.0-alpine-arm64
+    image: kong:3.6.1
     depends_on:
       kong-database:
         condition: service_healthy
