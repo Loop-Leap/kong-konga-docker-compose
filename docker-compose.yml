@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   kong-database:
-    image: postgres:13
+    image: postgres:11
     container_name: kong-database
     ports:
       - "5432:5432"  # Keep this if you want direct database access for debugging
@@ -90,9 +90,11 @@ services:
       - NODE_ENV=${NODE_ENV}
       - DB_ADAPTER=postgres
       - DB_HOST=kong-database
+      - DB_PORT=5432
       - DB_USER=${POSTGRES_USER}
       - DB_PASSWORD=${POSTGRES_PASSWORD}
       - DB_DATABASE=${KONGA_DB}
+      - KONGA_HOOK_TIMEOUT=120000
     depends_on:
       - kong-database
     networks:
