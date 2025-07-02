@@ -68,7 +68,7 @@ services:
       - KONG_PG_PASSWORD=${POSTGRES_PASSWORD}
       - KONG_PG_DATABASE=${POSTGRES_DB}
       - KONG_ADMIN_LISTEN=0.0.0.0:8001
-      - KONG_ADMIN_GUI_URL=https://${KONG_ADMIN_DOMAIN}
+      - KONG_ADMIN_GUI_URL=https://displate-gateway-admin.dev.displate.top
       - KONG_PROXY_ACCESS_LOG=/dev/stdout
       - KONG_ADMIN_ACCESS_LOG=/dev/stdout
       - KONG_PROXY_ERROR_LOG=/dev/stderr
@@ -77,12 +77,12 @@ services:
       - kong-net
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.kong-proxy.rule=Host(`${KONG_DOMAIN}`)"
+      - "traefik.http.routers.kong-proxy.rule=Host(`dev.displate.top`)"
       - "traefik.http.routers.kong-proxy.entrypoints=websecure"
       - "traefik.http.routers.kong-proxy.service=kong-proxy"
       - "traefik.http.routers.kong-proxy.tls.certresolver=letsencrypt"
       - "traefik.http.services.kong-proxy.loadbalancer.server.port=8000"
-      - "traefik.http.routers.kong-admin.rule=Host(`${KONG_ADMIN_DOMAIN}`)"
+      - "traefik.http.routers.kong-admin.rule=Host(`displate-gateway-admin.dev.displate.top`)"
       - "traefik.http.routers.kong-admin.entrypoints=websecure"
       - "traefik.http.routers.kong-admin.service=kong-admin"
       - "traefik.http.routers.kong-admin.tls.certresolver=letsencrypt"
@@ -108,7 +108,7 @@ services:
       - kong-net
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.konga.rule=Host(`${KONGA_DOMAIN}`)"
+      - "traefik.http.routers.konga.rule=Host(`konga.dev.displate.top`)"
       - "traefik.http.routers.konga.entrypoints=websecure"
       - "traefik.http.routers.konga.service=konga"
       - "traefik.http.routers.konga.tls.certresolver=letsencrypt"
