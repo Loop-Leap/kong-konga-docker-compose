@@ -56,7 +56,7 @@ services:
     restart: "no"
 
   kong:
-    image: kong/kong-gateway:3.6.1.0-alpine-arm64
+    image: kong:3.6.1
     container_name: kong
     depends_on:
       - kong-migrations
