@@ -1,31 +1,29 @@
 version: '3.8'
 
 services:
-  # PostgreSQL database for Kong storage
   kong-database:
-    image: arm64v8/postgres:11   # Use arm64 Postgres 11 image
+    image: arm64v8/postgres:11
     container_name: kong-database
     environment:
-      - POSTGRES_USER=${POSTGRES_USER}       # DB user from env variable
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}  # DB password from env variable
-      - POSTGRES_DB=${POSTGRES_DB}           # Database name from env variable
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     volumes:
-      - db-data-kong-postgres:/var/lib/postgresql/data  # Persist DB data on volume
+      - db-data-kong-postgres:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]  # Check DB readiness
-      interval: 10s        # Run health check every 10 seconds
-      timeout: 5s          # Timeout after 5 seconds
-      retries: 5           # Retry 5 times before marking unhealthy
-      start_period: 30s    # Initial delay before health checks start
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     networks:
-      - kong-net           # Connect to custom network 'kong-net'
+      - kong-net
 
-  # Helper service to create Konga's database if it doesn't exist
   konga-db-creator:
-    image: arm64v8/postgres:11   # Same Postgres image for running DB commands
+    image: arm64v8/postgres:11
     depends_on:
       kong-database:
-        condition: service_healthy   # Wait until kong-database is healthy
+        condition: service_healthy
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -42,102 +40,67 @@ services:
       "
     networks:
       - kong-net
-    restart: "no"  # Run once, do not restart
+    restart: "no"
 
-  # Run Kong database migrations before starting Kong service
   kong-migrations:
-    image: kong:3.6.1          # Kong official image version 3.6.1
+    image: kong:3.6.1
     depends_on:
       kong-database:
-        condition: service_healthy   # Wait for DB to be healthy
+        condition: service_healthy
     environment:
       - KONG_DATABASE=postgres
       - KONG_PG_HOST=kong-database
       - KONG_PG_USER=${POSTGRES_USER}
       - KONG_PG_PASSWORD=${POSTGRES_PASSWORD}
       - KONG_PG_DATABASE=${POSTGRES_DB}
-    command: kong migrations bootstrap   # Run bootstrap migrations (initialize schema)
+    command: kong migrations bootstrap
     networks:
       - kong-net
-    restart: "no"  # Run once and exit
+    restart: "no"
 
-  # Main Kong API Gateway service
   kong:
     image: kong:3.6.1
     container_name: kong
     depends_on:
-      - kong-migrations  # Start after migrations are done
+      - kong-migrations
     environment:
-      - KONG_DATABASE=postgres             # Use Postgres DB for Kong config storage
-      - KONG_PG_HOST=kong-database        # Hostname of the Postgres DB
+      - KONG_DATABASE=postgres
+      - KONG_PG_HOST=kong-database
       - KONG_PG_USER=${POSTGRES_USER}
       - KONG_PG_PASSWORD=${POSTGRES_PASSWORD}
       - KONG_PG_DATABASE=${POSTGRES_DB}
-      - KONG_ADMIN_LISTEN=0.0.0.0:8001    # Expose Kong Admin API on port 8001
-      - KONG_ADMIN_GUI_URL=https://displate-gateway-admin.dev.displate.top  # Admin GUI URL
-      - KONG_PROXY_ACCESS_LOG=/dev/stdout # Proxy access logs to container stdout
-      - KONG_ADMIN_ACCESS_LOG=/dev/stdout # Admin API access logs
-      - KONG_PROXY_ERROR_LOG=/dev/stderr  # Proxy error logs to stderr
-      - KONG_ADMIN_ERROR_LOG=/dev/stderr  # Admin error logs
+      - KONG_ADMIN_LISTEN=0.0.0.0:8001
+      - KONG_ADMIN_GUI_URL=https://displate-gateway-admin.dev.displate.top
+      - KONG_PROXY_ACCESS_LOG=/dev/stdout
+      - KONG_ADMIN_ACCESS_LOG=/dev/stdout
+      - KONG_PROXY_ERROR_LOG=/dev/stderr
+      - KONG_ADMIN_ERROR_LOG=/dev/stderr
     networks:
       - kong-net
-    labels:
-      - "traefik.enable=true"   # Enable Traefik proxy integration
-      # Traefik routing for Kong proxy (port 8000)
-      - "traefik.http.routers.kong-proxy.rule=Host(`dev.displate.top`)"
-      - "traefik.http.routers.kong-proxy.entrypoints=https"
-      - "traefik.http.routers.kong-proxy.service=kong-proxy"
-      - "traefik.http.routers.kong-proxy.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.kong-proxy.tls=true"
-      - "traefik.http.services.kong-proxy.loadbalancer.server.port=8000"
-      # Traefik routing for Kong Admin API (port 8001)
-      - "traefik.http.routers.kong-admin.rule=Host(`displate-gateway-admin.dev.displate.top`)"
-      - "traefik.http.routers.kong-admin.entrypoints=https"
-      - "traefik.http.routers.kong-admin.service=kong-admin"
-      - "traefik.http.routers.kong-admin.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.kong-admin.tls=true"
-      - "traefik.http.services.kong-admin.loadbalancer.server.port=8001"
-    restart: on-failure  # Restart Kong on failure
+    restart: on-failure
 
-  # Konga - Kong dashboard GUI for managing Kong via UI
   konga:
-    image: packyzbq/konga:0.14.9-arm64   # Konga image for arm64 architecture
+    image: packyzbq/konga:0.14.9-arm64
     container_name: konga
     depends_on:
-      - konga-db-creator   # Wait until Konga DB is created
+      - konga-db-creator
     environment:
       - NODE_ENV=production
-      - DB_ADAPTER=postgres           # Use Postgres DB for Konga config storage
-      - DB_HOST=kong-database         # Point to the same Postgres DB as Kong
+      - DB_ADAPTER=postgres
+      - DB_HOST=kong-database
       - DB_PORT=5432
       - DB_USER=${POSTGRES_USER}
       - DB_PASSWORD=${POSTGRES_PASSWORD}
       - DB_DATABASE=${KONGA_DB}
-      - KONGA_HOOK_TIMEOUT=120000     # Timeout for hooks (ms)
-      - KONGA_KONG_URL=http://kong:8001   # URL to Kong Admin API (inside docker network)
+      - KONGA_HOOK_TIMEOUT=120000
+      - KONGA_KONG_URL=http://kong:8001
     networks:
       - kong-net
-    labels:
-      - "traefik.enable=true"
-      # HTTPS routing for Konga dashboard
-      - "traefik.http.routers.konga.rule=Host(`konga.dev.displate.top`)"
-      - "traefik.http.routers.konga.entrypoints=https"
-      - "traefik.http.routers.konga.service=konga"
-      - "traefik.http.routers.konga.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.konga.tls=true"
-      - "traefik.http.services.konga.loadbalancer.server.port=1337"
-      # Redirect HTTP traffic to HTTPS
-      - "traefik.http.routers.konga-http.rule=Host(`konga.dev.displate.top`)"
-      - "traefik.http.routers.konga-http.entrypoints=http"
-      - "traefik.http.routers.konga-http.middlewares=redirect-to-https"
-      - "traefik.http.routers.konga-http.service=konga"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+    restart: on-failure
 
-# Volume to persist PostgreSQL data across container restarts
 volumes:
   db-data-kong-postgres:
 
-# Custom Docker network so containers can communicate internally
 networks:
   kong-net:
     driver: bridge
