@@ -87,7 +87,7 @@ services:
     depends_on:
       - konga-db-creator
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
       - DB_ADAPTER=postgres
       - DB_HOST=kong-database
       - DB_PORT=5432
