@@ -79,6 +79,7 @@ services:
       - STORES_API_KEY=${STORES_API_KEY}
       - PRODUCTS_API_KEY=${PRODUCTS_API_KEY}
       - MENUS_API_KEY=${MENUS_API_KEY}
+      - COMPANIES_API_KEY=${COMPANIES_API_KEY}
     networks:
       - kong-net
     restart: on-failure
