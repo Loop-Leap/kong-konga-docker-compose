@@ -1,0 +1,45 @@
+
+curl -H "Authorization: Bearer eyJraWQiOiJGVDNpeUVvZlJrbmFzeElBMEFhSzlxVDR5dTFiTWVSdCIsImFsZyI6IkhTMjU2In0.eyJ1c2VyX2lkIjoiZGU1ZDBjMzMtMDUwMy00ZjliLTkyYWItYzNhODJhZGNmMmU1IiwiZXhwIjoxNzUyMDEwNjkyLCJzY29wZSI6Im9uYm9hcmRpbmciLCJpYXQiOjE3NTIwMDg4OTIsImlzcyI6InJhaWxzLnVzZXJzIiwiYXVkIjoiZGlzcGxhdGUuY2xpZW50IiwicmVhbG0iOiJ1c2VycyJ9.muPqZzUeYKZqfJlh-1x0OWv1u9TZhcIekgt03VSfEd8" \
+  https://dev.displate.top/test-header-injection
+
+curl -X POST https://displate-gateway-admin.dev.displate.top/services/dca2be13-c9b7-48b4-8f1c-da4d916d3132/plugins \
+  --data "name=pre-function" \
+  --data-urlencode 'config.access[]=
+local auth_header = kong.request.get_header("authorization")
+
+if auth_header then
+  local token = auth_header:match("^Bearer%s+(.+)$")
+
+  if token then
+    local _, payload_encoded = token:match("([^%.]+)%.([^%.]+)%.?")
+    if payload_encoded then
+      local b64_payload = payload_encoded:gsub("-", "+"):gsub("_", "/")
+      local padding = #b64_payload % 4
+      if padding > 0 then
+        b64_payload = b64_payload .. string.rep("=", 4 - padding)
+      end
+
+      local ok, decoded_payload = pcall(ngx.decode_base64, b64_payload)
+      if ok and decoded_payload then
+        kong.service.request.set_header("X-Jwt-Payload", decoded_payload)
+
+        -- Extract user_id from JSON string manually
+        local user_id = decoded_payload:match("\"user_id\"%s*:%s*\"([^\"]+)\"")
+        if user_id then
+          kong.service.request.set_header("X-Forwarded-UserId", user_id)
+        else
+          kong.service.request.set_header("X-Debug-Error", "user_id_not_found_in_payload")
+        end
+      else
+        kong.service.request.set_header("X-Debug-Error", "decode_base64_failed")
+      end
+    else
+      kong.service.request.set_header("X-Debug-Error", "payload_not_found")
+    end
+  else
+    kong.service.request.set_header("X-Debug-Error", "no_token_found_by_match")
+  end
+else
+  kong.service.request.set_header("X-Debug-Error", "no_auth_header_found")
+end
+'
