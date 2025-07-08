@@ -86,7 +86,7 @@ services:
       - kong-net
     command: ["/bin/sh", "-c", "tail -f /dev/null"]
     restart: "no"
-    volumes: # ADDED BLOCK FOR CUSTOM PLUGIN VOLUME
+    #volumes: # ADDED BLOCK FOR CUSTOM PLUGIN VOLUME
       #- ./kong_plugins:/usr/local/share/lua/5.1/kong/plugins/
 
   konga:
