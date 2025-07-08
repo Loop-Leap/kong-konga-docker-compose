@@ -1,8 +1,4 @@
-
-curl -H "Authorization: Bearer eyJraWQiOiJGVDNpeUVvZlJrbmFzeElBMEFhSzlxVDR5dTFiTWVSdCIsImFsZyI6IkhTMjU2In0.eyJ1c2VyX2lkIjoiZGU1ZDBjMzMtMDUwMy00ZjliLTkyYWItYzNhODJhZGNmMmU1IiwiZXhwIjoxNzUyMDEwNjkyLCJzY29wZSI6Im9uYm9hcmRpbmciLCJpYXQiOjE3NTIwMDg4OTIsImlzcyI6InJhaWxzLnVzZXJzIiwiYXVkIjoiZGlzcGxhdGUuY2xpZW50IiwicmVhbG0iOiJ1c2VycyJ9.muPqZzUeYKZqfJlh-1x0OWv1u9TZhcIekgt03VSfEd8" \
-  https://dev.displate.top/test-header-injection
-
-curl -X POST https://displate-gateway-admin.dev.displate.top/services/dca2be13-c9b7-48b4-8f1c-da4d916d3132/plugins \
+curl -X POST https://displate-gateway-admin.dev.displate.top/services/a688a83d-039e-4cff-8b6c-692e0f39e5a8/plugins \
   --data "name=pre-function" \
   --data-urlencode 'config.access[]=
 local auth_header = kong.request.get_header("authorization")
