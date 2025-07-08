@@ -43,7 +43,7 @@ services:
     restart: "no"
 
   kong-migrations:
-    image: kong:3.6.1
+    image: kong:3.5.0
     depends_on:
       kong-database:
         condition: service_healthy
@@ -59,7 +59,7 @@ services:
     restart: "no"
 
   kong:
-    image: kong:3.6.1
+    image: kong:3.5.0
     container_name: kong
     depends_on:
       - kong-migrations
