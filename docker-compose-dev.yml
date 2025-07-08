@@ -81,7 +81,7 @@ services:
       - MENUS_API_KEY=${MENUS_API_KEY}
       - COMPANIES_API_KEY=${COMPANIES_API_KEY}
       - USERS_API_KEY=${USERS_API_KEY}
-      - KONG_PLUGINS=bundled,jwt-user-header # ADDED LINE FOR CUSTOM PLUGIN
+      #- KONG_PLUGINS=bundled,jwt-user-header # ADDED LINE FOR CUSTOM PLUGIN
     networks:
       - kong-net
     command: ["/bin/sh", "-c", "tail -f /dev/null"]
