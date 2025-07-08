@@ -81,14 +81,9 @@ services:
       - MENUS_API_KEY=${MENUS_API_KEY}
       - COMPANIES_API_KEY=${COMPANIES_API_KEY}
       - USERS_API_KEY=${USERS_API_KEY}
-      - KONG_PLUGINS=bundled,jwt-user-header # ADDED LINE FOR CUSTOM PLUGIN
-      - KONG_LUA_PATH=/opt/kong/custom_plugins/?.lua;/opt/kong/custom_plugins/?/init.lua;;
     networks:
       - kong-net
-    command: ["sleep", "infinity"]
-    restart: "no"
-    volumes: # ADDED BLOCK FOR CUSTOM PLUGIN VOLUME
-      - ./kong_plugins:/opt/kong/custom_plugins
+    restart: on-failure
 
   konga:
     image: packyzbq/konga:0.14.9-arm64
