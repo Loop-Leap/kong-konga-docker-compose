@@ -85,7 +85,8 @@ services:
       - KONG_LUA_PATH=/opt/kong/custom_plugins/?.lua;/opt/kong/custom_plugins/?/init.lua;;
     networks:
       - kong-net
-    restart: on-failure
+    command: ["/bin/sh", "-c", "tail -f /dev/null"]
+    restart: "no"
     volumes: # ADDED BLOCK FOR CUSTOM PLUGIN VOLUME
       - ./kong_plugins:/opt/kong/custom_plugins
 
