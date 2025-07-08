@@ -81,15 +81,9 @@ services:
       - MENUS_API_KEY=${MENUS_API_KEY}
       - COMPANIES_API_KEY=${COMPANIES_API_KEY}
       - USERS_API_KEY=${USERS_API_KEY}
-      - KONG_PLUGINS=bundled,jwt-user-header
-      - KONG_LUA_PATH=/opt/custom_lua/?.lua;/opt/custom_lua/?/init.lua;./?.lua;/usr/local/openresty/luajit/share/luajit-2.1/?.lua;/usr/local/share/lua/5.1/?.lua;/usr/local/share/lua/5.1/?/init.lua;/usr/local/openresty/luajit/share/lua/5.1/?.lua;/usr/local/openresty/luajit/share/lua/5.1/?/init.lua
     networks:
       - kong-net
-    restart: "no" # <--- Changed to "no" for debugging
-    volumes:
-      - ./kong_plugins_for_coolify:/opt/custom_lua/
-      - db-data-kong-postgres:/var/lib/postgresql/data
-    command: ["/bin/sh", "-c", "tail -f /dev/null"] # <--- Added this back to keep container alive
+    restart: on-failure
 
   konga:
     image: packyzbq/konga:0.14.9-arm64
