@@ -9,7 +9,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
     volumes:
-      - db-data-kong-postgres:/var/lib/postgresql/data
+      - db-data-kong-postgres:/var/lib/postgresql/data # This is where the DB data volume should be
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 10s
@@ -81,9 +81,16 @@ services:
       - MENUS_API_KEY=${MENUS_API_KEY}
       - COMPANIES_API_KEY=${COMPANIES_API_KEY}
       - USERS_API_KEY=${USERS_API_KEY}
+      - KONG_PLUGINS=bundled,jwt-user-header
+      - KONG_LUA_PATH=/usr/local/share/lua/5.1/?.lua;/usr/local/share/lua/5.1/?/init.lua;;
     networks:
       - kong-net
     restart: on-failure
+    volumes:
+      # This is the ONLY volume mount now needed for the 'kong' service itself
+      # It mounts your custom plugins.
+      - ./kong_plugins_for_coolify:/usr/local/share/lua/5.1/
+    command: kong docker-start
 
   konga:
     image: packyzbq/konga:0.14.9-arm64
