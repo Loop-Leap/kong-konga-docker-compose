@@ -81,9 +81,19 @@ services:
       - MENUS_API_KEY=${MENUS_API_KEY}
       - COMPANIES_API_KEY=${COMPANIES_API_KEY}
       - USERS_API_KEY=${USERS_API_KEY}
+      # --- START OF CUSTOM PLUGIN ADDITIONS FOR DEBUGGING ---
+      - KONG_PLUGINS=bundled,jwt-user-header
+      - KONG_LUA_PATH=/opt/custom_lua/?.lua;/opt/custom_lua/?/init.lua;./?.lua;/usr/local/openresty/luajit/share/luajit-2.1/?.lua;/usr/local/share/lua/5.1/?.lua;/usr/local/share/lua/5.1/?/init.lua;/usr/local/openresty/luajit/share/lua/5.1/?.lua;/usr/local/openresty/luajit/share/lua/5.1/?/init.lua
+      # --- END OF CUSTOM PLUGIN ADDITIONS FOR DEBUGGING ---
     networks:
       - kong-net
-    restart: on-failure
+    restart: "no" # Set to "no" for debugging
+    volumes:
+      # --- START OF CUSTOM PLUGIN VOLUME MOUNT ---
+      - ./kong_custom_mount_root:/opt/custom_lua/ # This is your custom plugin mount
+      # --- END OF CUSTOM PLUGIN VOLUME MOUNT ---
+      - db-data-kong-postgres:/var/lib/postgresql/data
+    command: ["/bin/sh", "-c", "tail -f /dev/null"] # Command to keep container alive for debugging
 
   konga:
     image: packyzbq/konga:0.14.9-arm64
