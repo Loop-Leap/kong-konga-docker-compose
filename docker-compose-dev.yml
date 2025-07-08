@@ -40,7 +40,7 @@ services:
       "
     networks:
       - kong-net
-    restart: "no" # This can remain "no" as it's a one-off setup container
+    restart: "no"
 
   kong-migrations:
     image: kong:3.6.1
@@ -56,7 +56,7 @@ services:
     command: kong migrations bootstrap
     networks:
       - kong-net
-    restart: "no" # This can remain "no" as it's a one-off migration container
+    restart: "no"
 
   kong:
     image: kong:3.6.1
@@ -85,9 +85,11 @@ services:
       - KONG_LUA_PATH=/opt/custom_lua/?.lua;/opt/custom_lua/?/init.lua;./?.lua;/usr/local/openresty/luajit/share/luajit-2.1/?.lua;/usr/local/share/lua/5.1/?.lua;/usr/local/share/lua/5.1/?/init.lua;/usr/local/openresty/luajit/share/lua/5.1/?.lua;/usr/local/openresty/luajit/share/lua/5.1/?/init.lua
     networks:
       - kong-net
-    restart: on-failure
+    restart: "no" # <--- Changed to "no" for debugging
     volumes:
       - ./kong_plugins_for_coolify:/opt/custom_lua/
+      - db-data-kong-postgres:/var/lib/postgresql/data
+    command: ["/bin/sh", "-c", "tail -f /dev/null"] # <--- Added this back to keep container alive
 
   konga:
     image: packyzbq/konga:0.14.9-arm64
