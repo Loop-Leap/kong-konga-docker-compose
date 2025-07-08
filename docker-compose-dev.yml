@@ -89,14 +89,14 @@ services:
       # --- END OF CUSTOM PLUGIN ADDITIONS ---
     networks:
       - kong-net
-    restart: on-failure
+    command: ["sleep", "infinity"] # <--- TEMPORARY: Keep container running for debugging
+    restart: "no" 
     volumes:
       # --- START OF CUSTOM PLUGIN VOLUME MOUNT ---
       # Mount your host directory with the 'kong/plugins' structure
       # into a NEW, custom directory in the container.
       - ./kong_custom_mount_root:/opt/custom_lua/
       # --- END OF CUSTOM PLUGIN VOLUME MOUNT ---
-    command: kong docker-start
 
   konga:
     image: packyzbq/konga:0.14.9-arm64
