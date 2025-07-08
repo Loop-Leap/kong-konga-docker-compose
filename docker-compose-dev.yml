@@ -89,7 +89,7 @@ services:
       # --- END OF CUSTOM PLUGIN ADDITIONS ---
     networks:
       - kong-net
-    command: ["sleep", "infinity"] # <--- TEMPORARY: Keep container running for debugging
+    command: ["/bin/sh", "-c", "tail -f /dev/null"] # <--- TEMPORARY: Keep container running for debugging
     restart: "no" 
     volumes:
       # --- START OF CUSTOM PLUGIN VOLUME MOUNT ---
