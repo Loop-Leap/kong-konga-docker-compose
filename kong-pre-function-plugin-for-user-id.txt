@@ -39,3 +39,5 @@ else
   kong.service.request.set_header("X-Debug-Error", "no_auth_header_found")
 end
 '
+
+https://displate-gateway-admin.dev.displate.top:8001
