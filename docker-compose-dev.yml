@@ -103,6 +103,9 @@ services:
       - DB_DATABASE=${KONGA_DB}
       - KONGA_HOOK_TIMEOUT=120000
       - KONGA_KONG_URL=http://kong:8001
+      - KONG_ADMIN_URL=http://kong:8001
+      - KONG_URL=http://kong:8001
+      - KONG_ADMIN_DOMAIN=http://kong:8001
     networks:
       - kong-net
     restart: on-failure
