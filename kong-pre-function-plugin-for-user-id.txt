@@ -40,4 +40,4 @@ else
 end
 '
 
-https://displate-gateway-admin.dev.displate.top:8001
+url-admin:https://displate-gateway-admin.dev.displate.top:8001
