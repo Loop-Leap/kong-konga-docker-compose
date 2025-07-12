@@ -1,6 +1,8 @@
+version: '3.8'
+
 networks:
   kong-net:
-    driver: bridgeversion: '3.8'
+    driver: bridge
 
 services:
   kong-database:
