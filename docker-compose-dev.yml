@@ -17,9 +17,7 @@ services:
       retries: 5
       start_period: 30s
     networks:
-      kong-net:
-        aliases:
-          - kong-admin
+      - kong-net
 
   konga-db-creator:
     image: arm64v8/postgres:11
@@ -104,14 +102,10 @@ services:
       - DB_PASSWORD=${POSTGRES_PASSWORD}
       - DB_DATABASE=${KONGA_DB}
       - KONGA_HOOK_TIMEOUT=120000
-      - KONGA_KONG_URL=http://kong-admin:8001
+      - KONGA_KONG_URL=http://kong:8001
     networks:
       - kong-net
     restart: on-failure
 
 volumes:
   db-data-kong-postgres:
-
-networks:
-  kong-net:
-    driver: bridge
