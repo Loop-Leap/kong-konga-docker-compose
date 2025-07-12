@@ -70,7 +70,7 @@ services:
       - KONG_PG_PASSWORD=${POSTGRES_PASSWORD}
       - KONG_PG_DATABASE=${POSTGRES_DB}
       - KONG_ADMIN_LISTEN=0.0.0.0:8001
-      - KONG_ADMIN_GUI_URL=http://displate-gateway-admin.dev.displate.top
+      - KONG_ADMIN_GUI_URL=http://kong:8001
       - KONG_PROXY_ACCESS_LOG=/dev/stdout
       - KONG_ADMIN_ACCESS_LOG=/dev/stdout
       - KONG_PROXY_ERROR_LOG=/dev/stderr
