@@ -85,7 +85,7 @@ services:
       - COMPANIES_API_KEY=${COMPANIES_API_KEY}
       - USERS_API_KEY=${USERS_API_KEY}
     networks:
-      - kong-net
+      kong-net:         # Tutti come oggetti
       coolify:
         aliases:
           - dev.displate.top
