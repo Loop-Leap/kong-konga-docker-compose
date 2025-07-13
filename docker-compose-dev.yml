@@ -86,6 +86,9 @@ services:
       - USERS_API_KEY=${USERS_API_KEY}
     networks:
       - kong-net
+      coolify:
+        aliases:
+          - dev.displate.top
     restart: on-failure
 
   konga:
